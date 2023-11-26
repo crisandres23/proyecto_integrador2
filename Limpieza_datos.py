@@ -1,16 +1,28 @@
 import requests
-
-#crear la funcion descargar_datos
-def descargar_datos(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        #abrir el archivo datos.csv
-        with open('datos.csv', 'w') as archivo:
-            archivo.write(response.text)
-        print("Los datos han sido descargados y guardados como datos.csv")
+import pandas as pd
+def procesar_datos(dataframe):
+    # Verificar valores faltantes
+    if dataframe.isnull().sum().sum() > 0:
+        dataframe = dataframe.dropna()
+        print("Se eliminaron las filas con valores faltantes.")
+    # Verificar filas repetidas
+    if dataframe.duplicated().sum() > 0:
+        dataframe = dataframe.drop_duplicates()
+        print("Se eliminaron las filas duplicadas.")
+    # Detección y eliminación de valores atípicos (agrega tu lógica aquí)
+    # Verificar si la columna 'Edad' existe en el DataFrame
+    if 'Edad' in dataframe.columns:
+        # Crear columna de categoría de edades
+        dataframe['Categoria Edad'] = pd.cut(dataframe['Edad'], bins=[0, 12, 19, 39, 59, float('inf')], labels=['Niño', 'Adolescente', 'Joven Adulto', 'Adulto', 'Adulto Mayor'])
+        print("Se creó la columna 'Categoria Edad'.")
     else:
-        print("No se pudo descargar los datos. Código de respuesta:", response.status_code)
+        print("La columna 'Edad' no existe en el DataFrame.")
+    # Guardar resultado como CSV (especifica una ruta de archivo significativa)
+    dataframe.to_csv('datos_procesados.csv', index=False)
+    print("Los datos procesados han sido guardados como datos_procesados.csv")
 
-# llamar a la funcion descargar_datos
-url_datos = "https://huggingface.co/datasets/mstz/heart_failure/raw/main/heart_failure_clinical_records_dataset.csv"
-descargar_datos(url_datos)
+# Leer el archivo CSV descargado
+dataframe = pd.read_csv('datos.csv')
+# Llamar a la función para procesar los datos
+procesar_datos(dataframe)
+
