@@ -1,39 +1,35 @@
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import plotly.express as px
+from sklearn.manifold import TSNE
 
-# Leer los datos
-nombre_archivo = "datos_procesados_nuevo.csv"
-df = pd.read_csv(nombre_archivo)
-
-# Histograma de Edades
-plt.figure(figsize=(8, 6))
+# Leer el conjunto de datos
+df = pd.read_csv("datos_procesados_nuevo.csv")
+plt.figure(figsize=(10,5))
 plt.hist(df['age'], bins=10, edgecolor='black')
 plt.title('Distribución de Edades')
 plt.xlabel('Edad')
-plt.ylabel('Número de Personas')
+plt.ylabel('Frecuencia')
 plt.show()
+condiciones = ['anaemia', 'diabetes', 'smoking', 'DEATH_EVENT']
+num_condiciones = len(condiciones)
+width = 0.35
+fig, ax = plt.subplots(figsize=(10, 5))
+x = np.arange(num_condiciones)
+color_hombres = 'blue'
+color_mujeres = 'red'
+for i, condicion in enumerate(condiciones):
+    hombres = df[(df['sex'] == 1) & (df[condicion] == 1)].shape[0]
+    mujeres = df[(df['sex'] == 0) & (df[condicion] == 1)].shape[0]
+    ax.bar(x[i] - width/2, hombres, width, color=color_hombres, label='Hombres' if i == 0 else "")
+    ax.bar(x[i] + width/2, mujeres, width, color=color_mujeres, label='Mujeres' if i == 0 else "")
 
-# Histogramas agrupados por género
-variables = ['anaemia', 'diabetes', 'smoking', 'DEATH_EVENT']
-gender_labels = ['Hombres', 'Mujeres']
-
-width = 0.35  # Ancho de las barras
-
-for variable in variables:
-    plt.figure(figsize=(8, 6))
-    print(f'\nDatos para {variable.capitalize()}:')
-
-    for i, gender in enumerate(['male', 'female']):
-        subset = df[df['sex'] == gender]
-        counts = subset[variable].value_counts()
-        print(f'{gender_labels[i]}: {counts}')
-
-        x = range(len(counts))
-        plt.bar([pos + i * width for pos in x], counts, width=width, label=gender_labels[i], edgecolor='black')
-
-    plt.title(f'Distribución de {variable.capitalize()} por Género')
-    plt.xlabel(f'{variable.capitalize()}')
-    plt.ylabel('Número de Personas')
-    plt.xticks([pos + width / 2 for pos in x], counts.index)
-    plt.legend()
-    plt.show()
+ax.set_xlabel('Categoria')
+ax.set_ylabel('Cantidad')
+ax.set_title('Histograma agrupado por Sexo')
+ax.set_xticks(x)
+ax.set_xticklabels(condiciones)
+ax.legend()
+plt.show()
