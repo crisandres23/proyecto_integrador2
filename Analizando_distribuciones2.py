@@ -31,7 +31,7 @@ for i, variable in enumerate(variables):
     # Utilizar los valores personalizados si están definidos
     values = custom_values.get(variable, df[variable].value_counts())
     
-    ax.pie(values, labels=['Si', 'No'], autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightcoral'])
+    ax.pie(values, labels=['No', 'Si'], autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightcoral'])
     ax.set_title(f'Distribución de {variable.capitalize()}')
 
 # Ajustes de diseño
